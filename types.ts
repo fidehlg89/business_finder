@@ -6,6 +6,8 @@ export interface Lead {
   user_ratings_total: number;
   business_status: 'OPERATIONAL' | 'CLOSED_TEMPORARILY' | 'CLOSED_PERMANENTLY';
   website?: string | null;
+  phone?: string | null;
+  email?: string | null;
   types: string[];
   place_id: string;
   suggested_solution?: string;

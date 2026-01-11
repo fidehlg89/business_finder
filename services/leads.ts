@@ -33,7 +33,8 @@ export async function findLeadsAction(category: string, location: string): Promi
 
       For each business:
       1. Analyze its name and category to determine the best digital automation to sell them (e.g., Booking System, Order Automation, Inventory Sync).
-      2. WRITE A SHORT COLD EMAIL (max 80 words) pitching this specific automation.
+      2. Try to find a public PHONE NUMBER and EMAIL ADDRESS if listed in the directory info.
+      3. WRITE A SHORT COLD EMAIL (max 80 words) pitching this specific automation.
       
       Return a RAW JSON array (do not use Markdown code blocks) of objects with this exact schema:
       {
@@ -43,6 +44,8 @@ export async function findLeadsAction(category: string, location: string): Promi
         "user_ratings_total": number,
         "business_status": "OPERATIONAL",
         "website": string | null, 
+        "phone": string | null, // The public phone number
+        "email": string | null, // The public email if available
         "types": string[],
         "suggested_solution": string, // e.g. "Automated Reservation System"
         "suggestion_reason": string,   // A short sentence explaining WHY.
@@ -87,6 +90,8 @@ export async function findLeadsAction(category: string, location: string): Promi
       user_ratings_total: Number(item.user_ratings_total) || 0,
       business_status: 'OPERATIONAL',
       website: item.website || null,
+      phone: item.phone || null,
+      email: item.email || null,
       types: Array.isArray(item.types) ? item.types : [category],
       place_id: `pid_${idx}`,
       suggested_solution: item.suggested_solution || "Professional Landing Page",

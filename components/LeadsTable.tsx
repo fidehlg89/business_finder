@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Lead } from '../types';
-import { MapPin, Globe, Star, AlertCircle, ExternalLink, Map as MapIcon, ChevronDown, ChevronUp, Search, CheckCircle2, ChevronLeft, ChevronRight, Zap, Lightbulb, Mail, Copy, Check } from 'lucide-react';
+import { MapPin, Globe, Star, AlertCircle, ExternalLink, Map as MapIcon, ChevronDown, ChevronUp, Search, CheckCircle2, ChevronLeft, ChevronRight, Zap, Lightbulb, Mail, Copy, Check, Phone, ArrowUpRight } from 'lucide-react';
 
 interface LeadsTableProps {
   leads: Lead[];
@@ -112,14 +112,33 @@ export const LeadsTable: React.FC<LeadsTableProps> = ({ leads, isLoading }) => {
                       </span>
                     </div>
                     
-                    {/* Address */}
-                    <div className="flex items-start text-gray-300 gap-2 text-sm">
-                      <MapPin className="w-4 h-4 text-primary-500 shrink-0 mt-0.5" />
-                      <span className="leading-snug">{lead.address}</span>
+                    {/* Address & Contact Info */}
+                    <div className="space-y-1.5">
+                        <div className="flex items-start text-gray-300 gap-2 text-sm">
+                        <MapPin className="w-4 h-4 text-primary-500 shrink-0 mt-0.5" />
+                        <span className="leading-snug opacity-90">{lead.address}</span>
+                        </div>
+                        
+                        {(lead.phone || lead.email) && (
+                            <div className="flex flex-wrap gap-x-4 gap-y-1 pl-6">
+                                {lead.phone && (
+                                    <a href={`tel:${lead.phone}`} className="flex items-center gap-1.5 text-xs text-blue-300 hover:text-blue-200 transition-colors">
+                                        <Phone className="w-3 h-3" />
+                                        {lead.phone}
+                                    </a>
+                                )}
+                                {lead.email && (
+                                    <span className="flex items-center gap-1.5 text-xs text-indigo-300">
+                                        <Mail className="w-3 h-3" />
+                                        {lead.email}
+                                    </span>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* Stats Row */}
-                    <div className="flex items-center gap-3 text-sm text-gray-400 flex-wrap pt-1">
+                    <div className="flex items-center gap-3 text-sm text-gray-400 flex-wrap pt-2">
                       <div className="flex items-center gap-1 text-amber-400">
                         <Star className="w-3.5 h-3.5 fill-current" />
                         <span className="font-bold text-white">{lead.rating}</span>
@@ -178,7 +197,7 @@ export const LeadsTable: React.FC<LeadsTableProps> = ({ leads, isLoading }) => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex-1 md:flex-none flex items-center justify-center gap-2 px-3 py-2.5 bg-glass-200 hover:bg-glass-300 active:scale-95 text-white rounded-lg transition-colors text-sm font-medium border border-glass-300"
-                        title="Open in Google Maps to verify contact info"
+                        title="Open in Google Maps"
                       >
                         <ExternalLink className="w-4 h-4" />
                       </a>
@@ -188,7 +207,7 @@ export const LeadsTable: React.FC<LeadsTableProps> = ({ leads, isLoading }) => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex-1 md:flex-none flex items-center justify-center gap-2 px-3 py-2.5 bg-glass-200 hover:bg-glass-300 active:scale-95 text-white rounded-lg transition-colors text-sm font-medium border border-glass-300"
-                        title="Research if they have a hidden website or social media"
+                        title="Search web"
                       >
                         <Search className="w-4 h-4" />
                       </a>
@@ -200,19 +219,36 @@ export const LeadsTable: React.FC<LeadsTableProps> = ({ leads, isLoading }) => {
               {/* Email Draft Section */}
               {isEmailOpen && lead.email_draft_subject && (
                 <div className="w-full bg-black/40 border-t border-glass-200 animate-in fade-in slide-in-from-top-2 duration-300 p-4 sm:p-6">
-                  <div className="bg-glass-100 rounded-lg p-4 border border-glass-200">
-                     <div className="flex justify-between items-start mb-4 gap-2">
+                  <div className="bg-glass-100 rounded-lg p-4 border border-glass-200 relative">
+                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-4">
                         <div className="space-y-1 w-full">
                             <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Subject</span>
                             <div className="text-sm sm:text-base font-medium text-white">{lead.email_draft_subject}</div>
+                            {lead.email && (
+                                <div className="text-xs text-indigo-300 mt-1 flex items-center gap-1">
+                                    To: {lead.email}
+                                </div>
+                            )}
                         </div>
-                        <button 
-                           onClick={() => copyToClipboard(`${lead.email_draft_subject}\n\n${lead.email_draft_body}`, lead.id)}
-                           className="shrink-0 p-2 hover:bg-glass-300 rounded-lg text-gray-400 hover:text-white transition-colors"
-                           title="Copy Subject & Body"
-                        >
-                            {copiedId === lead.id ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                        </button>
+                        
+                        <div className="flex gap-2 self-end sm:self-start">
+                            {lead.email && (
+                                <a 
+                                  href={`mailto:${lead.email}?subject=${encodeURIComponent(lead.email_draft_subject)}&body=${encodeURIComponent(lead.email_draft_body || '')}`}
+                                  className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-medium text-white transition-colors"
+                                >
+                                    <ArrowUpRight className="w-3.5 h-3.5" />
+                                    Send via App
+                                </a>
+                            )}
+                            <button 
+                               onClick={() => copyToClipboard(`${lead.email_draft_subject}\n\n${lead.email_draft_body}`, lead.id)}
+                               className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-glass-300 hover:bg-glass-400 rounded-lg text-xs font-medium text-gray-200 transition-colors"
+                            >
+                                {copiedId === lead.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                                {copiedId === lead.id ? 'Copied' : 'Copy'}
+                            </button>
+                        </div>
                      </div>
                      <div className="w-full h-px bg-glass-200 mb-4" />
                      <div className="space-y-1">
